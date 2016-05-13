@@ -7,6 +7,7 @@ import android.hardware.Camera;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mBtn_dp.setOnClickListener(this);
         mBtn_memory.setOnClickListener(this);
         mBtn_root.setOnClickListener(this);
-//        mBtn_camare.setOnClickListener(this);
+        mBtn_camare.setOnClickListener(this);
 
     }
 
@@ -75,11 +76,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn:
                 TelephonyManager telManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
                 int networkType = telManager.getNetworkType();
-                 String subscriberId = telManager.getSubscriberId();
+                String subscriberId = telManager.getSubscriberId();
                 String deviceId = telManager.getDeviceId();
                 String line1Number = telManager.getLine1Number();
                 int dataState = telManager.getDataState();
-                 String simOperatorName = telManager.getSimOperatorName();
+                String simOperatorName = telManager.getSimOperatorName();
                 int phoneType = telManager.getPhoneType();
                 String radioVersion = Build.getRadioVersion();
                 String simCountryIso = telManager.getSimCountryIso();
@@ -93,10 +94,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         + "\n基带版本:" + radioVersion
                         + "\n操作系统:" + baseOs
                         + "\nsdk:" + sdkInt
-                        +"\nSIM提供商的国家代码:"+simCountryIso
-                        +"\n设备运营商:"+simOperatorName
-                        +"\n移动终端的类型:"+phoneType
-                        +"\n手机IMSI:"+subscriberId
+                        + "\nSIM提供商的国家代码:" + simCountryIso
+                        + "\n设备运营商:" + simOperatorName
+                        + "\n移动终端的类型:" + phoneType
+                        + "\n手机IMSI:" + subscriberId
                         + "\n系统版本号:" + release;
                 mTv_text.setText(s);
 
@@ -115,16 +116,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 int networkId = wifiInfo.getNetworkId();
                 String ssid = wifiInfo.getSSID();
                 int ipAddress = wifiInfo.getIpAddress();
+                String s2 = longToIP(ipAddress);
                 String macAddress = wifiInfo.getMacAddress();
                 int rssi = wifiInfo.getRssi();
                 int linkSpeed = wifiInfo.getLinkSpeed();
                 String ss = "BSSID:" + bssid
-                        +"\nSSID是否被隐藏:"+hiddenSSID
+                        + "\nSSID是否被隐藏:" + hiddenSSID
                         + "\n网络id:" + networkId
-                        + "\nIP地址:" + ipAddress
-                        +"\n物理MAC地址:"+macAddress
-                        +"\n802.11n网络信号:"+rssi
-                        +"\nSSID:"+ssid
+                        + "\nIP地址:" + s2
+                        + "\n物理MAC地址:" + macAddress
+                        + "\n802.11n网络信号:" + rssi
+                        + "\nSSID:" + ssid
                         + "\n网速:" + linkSpeed;
                 mTv_text.setText(ss);
                 break;
@@ -170,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_root:
                 boolean root = isRoot();
-                mTv_text.setText("root");
+                mTv_text.setText("是否Root:" + root);
                 break;
             case R.id.btn_camare:
 
@@ -186,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
                 camera.release();
-                int S=  sss.width + sss.height; // 3264px---2448px 1920*1080
+                int S = sss.width + sss.height; // 3264px---2448px 1920*1080
                 mTv_text.setText(S);
                 break;
             case R.id.btn_back:
@@ -229,5 +231,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return bool;
     }
 
+    private String longToIP(long longIp) {
+        StringBuffer sb = new StringBuffer("");
+
+        sb.append(String.valueOf((longIp & 0x000000FF)));
+        // 将高24位置0
+        sb.append(".");
+        sb.append(String.valueOf((longIp & 0x0000FFFF) >>> 8));
+        //  将高1位置0，然后右移8位
+        sb.append(".");
+        //将高8位置0，然后右移16位
+        sb.append(String.valueOf((longIp & 0x00FFFFFF) >>> 16));
+        sb.append(".");
+        // 直接右移24位
+        sb.append(String.valueOf((longIp >>> 24)));
+        return sb.toString();
+    }
 
 }
