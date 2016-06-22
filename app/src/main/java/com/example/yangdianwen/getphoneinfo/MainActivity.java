@@ -4,6 +4,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Camera;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -40,6 +42,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initView();
+        initEvents();
+    }
+
+
+    //初始化视图控件
+    private void initView() {
         mBtn = (Button) findViewById(R.id.btn);
         mBtn_cpu = (Button) findViewById(R.id.btn_cpu);
         mBtn_wifi = (Button) findViewById(R.id.btn_wifi);
@@ -49,6 +58,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mBtn_camare = (Button) findViewById(R.id.btn_camare);
         mBtn_back = (Button) findViewById(R.id.btn_back);
         mTv_text = (TextView) findViewById(R.id.tv);
+    }
+    //初始化事件
+    private void initEvents() {
         mBtn_back.setOnClickListener(this);
         mBtn.setOnClickListener(this);
         mBtn_cpu.setOnClickListener(this);
@@ -60,8 +72,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
     @Override
     public void onClick(final View v) {
+        //设置控件的可见属性
+        //当点击了主界面上的某个控件后，主界面所有控件都隐藏，并显示相关信息，返回按键出现
+        //当点击了返回按键时则设置主界面所有按键都显示，返回按键和显示的相关信息隐藏
+        //实现了在一个activity的所有逻辑操作
         mBtn.setVisibility(View.INVISIBLE);
         mBtn_dp.setVisibility(View.INVISIBLE);
         mBtn_cpu.setVisibility(View.INVISIBLE);
@@ -71,10 +88,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mBtn_camare.setVisibility(View.INVISIBLE);
         mBtn_back.setVisibility(View.VISIBLE);
         mTv_text.setVisibility(View.VISIBLE);
-
         switch (v.getId()) {
             case R.id.btn:
+                //从系统服务获取手机管理者
                 TelephonyManager telManager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+                //获取网络类型
                 int networkType = telManager.getNetworkType();
                 String subscriberId = telManager.getSubscriberId();
                 String deviceId = telManager.getDeviceId();
@@ -84,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 int phoneType = telManager.getPhoneType();
                 String radioVersion = Build.getRadioVersion();
                 String simCountryIso = telManager.getSimCountryIso();
+                //基带版本
                 String baseOs = Build.VERSION.BASE_OS;
                 int sdkInt = Build.VERSION.SDK_INT;
                 String release = Build.VERSION.RELEASE;
@@ -100,7 +119,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         + "\n手机IMSI:" + subscriberId
                         + "\n系统版本号:" + release;
                 mTv_text.setText(s);
-
                 break;
             case R.id.btn_cpu:
                 File dir = new File("/sys/devices/system/cpu");
@@ -109,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mTv_text.setText("CPU数量:" + length);
                 break;
             case R.id.btn_wifi:
+                //显示wifi相关信息
                 WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
                 WifiInfo wifiInfo = wifiManager.getConnectionInfo();
                 String bssid = wifiInfo.getBSSID();
@@ -175,21 +194,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mTv_text.setText("是否Root:" + root);
                 break;
             case R.id.btn_camare:
-
-                Camera camera = Camera.open();
-                Camera.Parameters parameters = camera.getParameters();
-                List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
-                Camera.Size sss = null;
-                for (Camera.Size size : sizes) {
-                    if (sss == null) {
-                        sss = size;
-                    } else if (sss.width * sss.height < size.width * size.height) {
-                        sss = size;
-                    }
-                }
-                camera.release();
-                int S = sss.width + sss.height; // 3264px---2448px 1920*1080
-                mTv_text.setText(S);
+//
+//                Camera camera = Camera.open();
+//                Camera.Parameters parameters = camera.getParameters();
+//                List<Camera.Size> sizes = parameters.getSupportedPictureSizes();
+//                Camera.Size sss = null;
+//                for (Camera.Size size : sizes) {
+//                    if (sss == null) {
+//                        sss = size;
+//                    } else if (sss.width * sss.height < size.width * size.height) {
+//                        sss = size;
+//                    }
+//                }
+//                camera.release();
+//                int S = sss.width + sss.height; // 3264px---2448px 1920*1080
+//                mTv_text.setText(S);
                 break;
             case R.id.btn_back:
                 mBtn.setVisibility(View.VISIBLE);
@@ -231,6 +250,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return bool;
     }
 
+    //转换ip的方法
     private String longToIP(long longIp) {
         StringBuffer sb = new StringBuffer("");
 
